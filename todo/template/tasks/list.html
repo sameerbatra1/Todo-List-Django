@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To Do list</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        .mainContainer {
+            height: 100vh;
+            width: 100vw;
+            background: linear-gradient(to right, #ddd6f3, #faaca8);
+        }
+
+        .todo-list {
+            height: 80%;
+            width: 80%;
+            border: 1px solid black;
+            margin-top: 5%;
+            margin-left: 10%;
+            border-radius: 20px;
+        }
+
+        .enter-task {
+            justify-content: center;
+            display: flex;
+        }
+
+        .enter-task img {
+            width: 5vw;
+            height: auto;
+
+        }
+    </style>
+</head>
+
+<body>
+    <div class="mainContainer">
+        <div class="todo-list">
+            <div class="enter-task">
+                <img src="{% static 'check-circle.png' %}">
+            </div>
+            <div class="task-list">
+                <form method="POST" action="/">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    <input type="submit" name="Create Task">
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+
+<script>
+    const deleteButtons = document.querySelectorAll('.delete-button');
+    deleteButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const deleteForm = button.parentElement;
+            const taskName = deleteForm.querySelector('span').textContent;
+            const confirmDelete = confirm(`Are you sure you want to delete the task: ${taskName}?`);
+            if (confirmDelete) {
+                deleteForm.submit();
+            }
+        });
+    });
+</script>
