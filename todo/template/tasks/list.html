@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 
@@ -31,6 +32,7 @@
             margin-top: 5%;
             margin-left: 10%;
             border-radius: 20px;
+            overflow: auto;
         }
 
         .enter-task {
@@ -43,36 +45,144 @@
             height: auto;
 
         }
+
+        .task-list form {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .form-field {
+            /* display: flex; */
+            margin-right: 25px;
+            font-size: 1.25rem;
+
+        }
+
+        /* .form-field :nth-child(1) {
+            display: block;
+        } */
+
+        .form-field :nth-child(1) input[type=text] {
+            width: 50rem;
+            padding: 15px;
+        }
+
+        .submitTask {
+            padding: 15px;
+            margin-top: 75px;
+            cursor: pointer;
+            background: none;
+            /* border-radius: 20px; */
+            transition-duration: 0.4s;
+        }
+
+        .submitTask:hover {
+            background: #f9aeac;
+        }
+
+        .tasks table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .tasks th,
+        .tasks td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #565353;
+        }
+
+        /* .tasks th {
+            /* background-color: #f2f2f2;
+        } */
+
+
+        /* .tasks tbody tr:nth-child(even) {
+            background-color: #ded3ef;
+        } */
+
+        .tasks tbody tr:hover {
+            background-color: #fff4f4;
+        }
+
+        .tasks .delete-form {
+            display: inline-block;
+            margin-right: 5px;
+        }
     </style>
+    <!-- <script src="{% static 'tasks/javascript.js' %}"></script> -->
 </head>
 
 <body>
     <div class="mainContainer">
         <div class="todo-list">
             <div class="enter-task">
-                <img src="{% static 'check-circle.png' %}">
+                <img src="{% static 'Icons/check-circle.png' %}">
             </div>
             <div class="task-list">
                 <form method="POST" action="/">
                     {% csrf_token %}
-                    {{ form.as_p }}
-                    <input type="submit" name="Create Task">
+                    <div class="form-field">
+                        {{ form.as_p }}
+                    </div>
+                    <div class="form-field">
+                        <input type="submit" name="Create Task" class="submitTask">
+                    </div>
                 </form>
+            </div>
+            <div class="tasks">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Task</th>
+                            <th>Priority</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for task in tasks %}
+                        <tr>
+                            <td>
+                                {% if task.complete %}
+                                <strike>{{ task }}</strike>
+                                {% else %}
+                                <span>{{ task }}</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ task.get_priority_display }}</td>
+                            <td>
+                                <form method="POST" action="{% url 'delete' task.id %}" class="deleteForm">
+                                    {% csrf_token %}
+                                    <button type="submit" class="delete-button"
+                                        onclick="confirmDeleteTask(this.parentElement)">Delete</button>
+                                </form>
+
+                                <form method="GET" action="{% url 'update_task' task.id %}">
+                                    {% csrf_token %}
+                                    <button type="submit">Update</button>
+                                </form>
+
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
 </body>
 
+
+</html>
+
 <script>
-    const deleteButtons = document.querySelectorAll('.delete-button');
-    deleteButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            const deleteForm = button.parentElement;
-            const taskName = deleteForm.querySelector('span').textContent;
-            const confirmDelete = confirm(`Are you sure you want to delete the task: ${taskName}?`);
-            if (confirmDelete) {
-                deleteForm.submit();
-            }
-        });
-    });
+
+    function confirmDeleteTask(deleteForm) {
+        const taskName = deleteForm.querySelector('span').textContent;
+        const confirmDelete = confirm(`Are you sure you want to delete the task: ${taskName}?`);
+        if (confirmDelete) {
+            deleteForm.submit();
+        }
+    }
 </script>
